@@ -1,0 +1,15 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: data_domain_scaner
+      POSTGRES_PASSWORD: data_domain_scaner
+      POSTGRES_DB: data_domain_scaner
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data_domain_scaner
+volumes:
+  postgres:
