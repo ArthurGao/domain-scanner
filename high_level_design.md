@@ -16,16 +16,19 @@ Both support:
 ---
 
 ## Option 1: Monolithic Architecture
-
-```mermaid
-flowchart LR
-  A[Browser / SPA] --> B[Web Server (FastAPI / Spring Boot)]
-  B --> C[(Single RDBMS / Graph DB)]
-  B --> D[Stripe SDK]
-  B --> E[Email Service (SMTP)]
-  B --> F[Scheduler (Quartz / cron)]
-  B --> G[AI Module (Embedded)]
 ```
+Browser / SPA
+     |
+     v
+Web Server (FastAPI / Spring Boot)
+     |
+     |--> RDBMS / Graph DB
+     |--> Stripe SDK
+     |--> Email Service (SMTP)
+     |--> Scheduler (Quartz / cron)
+     |--> AI Module (Embedded)
+```
+
 
 ### Components
 
@@ -66,19 +69,28 @@ flowchart LR
 
 ## Option 2: Microservices Architecture
 
-```mermaid
-flowchart LR
-  A[Browser / SPA] 
-    -->|REST / GraphQL| APIGW[API Gateway / Kong]
-  subgraph Services
-    AuthSvc[Auth Service]  
-    UserSvc[User & Tenant Service]  
-    BillingSvc[Billing Service]  
-    DomainSvc[Domain Registry]  
-    ScanSvc[Scan Orchestrator]  
-    ResultSvc[Results Database]  
-    NotifySvc[Notification Service]  
-    AIReport[AI Reporting Service]  
+```
+              [Browser / SPA]
+                      |
+                      v
+       +-------------------------------+
+       |      API Gateway / Kong       |
+       |     (REST / GraphQL entry)    |
+       +-------------------------------+
+                  |
+    +-------------+-------------+-------------+-------------+-------------+-------------+-------------+
+    |             |             |             |             |             |             |             |
+    v             v             v             v             v             v             v             v
+[Auth Service] [User & Tenant] [Billing Svc] [Domain Svc] [Scan Svc] [Result DB] [Notify Svc] [AI Report Svc]
+
+    - Auth Service: issues JWTs, impersonation
+    - User & Tenant: org/team/role management
+    - Billing Service: Stripe integration, webhooks
+    - Domain Registry: domain CRUD, ownership
+    - Scan Orchestrator: triggers async scan jobs
+    - Results Database: stores scan results
+    - Notification Service: sends emails on scan complete
+    - AI Reporting Service: summarizes scan findings with LLMs
 ```
 
 ### Services
