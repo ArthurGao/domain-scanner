@@ -36,47 +36,90 @@ This project is a SaaS-style FastAPI application that allows users to register d
 
 ## 🚀 Getting Started
 
-1. **Install dependencies**
+- **Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-2. **Setup environment**
+- **Setup environment**
 
 ```bash
 cp .env.example .env
 # Edit environment variables (DB, JWT secret, etc.)
 ```
-3. Launch PostgreSQL
+- Launch PostgreSQL
 
 ```bash
 docker-compose up -d
 ```
 
-3. **Run Alembic migrations**
+- **Run Alembic migrations**
 
 ```bash
 alembic upgrade head
 ```
 
-4. **Run development server**
+- **Run development server**
 
 ```bash
  uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-5. **(Optional) Create default admin user**
+- **(Optional) Create default admin user**
 
 ```bash
 PYTHONPATH=. python scripts/create_admin_user.py
 ```
 
-## 🔄 Schedule Example
+## How to use
 
-```json
-{
-  "name": "Monthly Scan",
+1. Login with super admin
+```curl
+curl --location 'http://0.0.0.0:8000/api/auth/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email" : "admin@example.com",
+    "password": "admin123"
+}'
+```
+Get JWT token from the response.
+
+2. Create a new organization
+```curl
+curl --location 'http://0.0.0.0:8000/api/orgs' \
+--header 'Authorization: Bearer {{token}}' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name" : "TestOrg1"
+}'
+```
+replace {token} with the JWT token from step 1.
+
+3. Create a new user
+```curl
+curl --location 'http://0.0.0.0:8000/api/users' \
+--header 'Authorization: Bearer {{token}}' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email" : "test@test.com",
+    "password" : "12345",
+    "organization_id" : "c8497b18-ac88-49a9-ab84-c6f3ce2c87cf"
+}'
+```
+>  **NOTE** : URL can be changed to `http://0.0.0.0:8000/api/{org_id}/users` to create user in specific org. And here will be a validation for if the admin belongs to this org_id.
+
+4. Login with user and get JWT token
+
+5. Create a user scan
+
+- Monthly scan
+```curl
+curl --location 'http://0.0.0.0:8000/api/scan' \
+--header 'Authorization: Bearer {{token}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "Monthly Vulnerability Scan",
   "type": "scheduled",
   "target": "example.com",
   "schedule": {
@@ -88,8 +131,34 @@ PYTHONPATH=. python scripts/create_admin_user.py
     "cron_day_of_week": "*",
     "enabled": true
   }
-}
+}'
 ```
+
+- Minute scan
+```curl
+curl --location 'http://0.0.0.0:8000/api/scan' \
+--header 'Authorization: Bearer {{token}}' \
+--data '{
+  "name": "Every Minute Scan",
+  "type": "scheduled",
+  "target": "example.com",
+  "schedule": {
+    "schedule_type": "cron",
+    "cron_minute": "*",
+    "cron_hour": "*",
+    "cron_day": "*",
+    "cron_month": "*",
+    "cron_day_of_week": "*",
+    "enabled": true
+  }
+}'
+```
+>  **NOTE** : URL is not properly defined yet. It will be changed to `http://0.0.0.0:8000/api/{org_id}/users/scan.  Here also need validation for if the admin belongs to this org_id.
+
+## AI analysis
+Add relational DB MCP to Claude for desktop(mcp_scan_server.py). Which make Claude LLM(local) can access to our DB and do analysis.
+![img_1.png](img_1.png)
+![img_2.png](img_2.png)
 
 ## 📬 Health Check
 

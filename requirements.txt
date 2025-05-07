@@ -11,3 +11,4 @@ pydantic-settings>=2.0
 stripe
 email-validator
 apscheduler
+mcp

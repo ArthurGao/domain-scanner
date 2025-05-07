@@ -37,12 +37,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# TODO:
+#  1. Add authentication middleware
+#  2. Update URL to /api/{org_id}/XXXX, add org_id to all endpoints. And need validate org_id match with login user
+
 app.include_router(auth_router.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(users_router.router, prefix="/api/users", tags=["Users"])
 app.include_router(organization_router.router, prefix="/api/orgs", tags=["Organizations"])
 app.include_router(user_scan_router.router, prefix="/api/scan", tags=["Scan"])
 app.include_router(user_scan_result_router.router, prefix="/api/scan_results", tags=["Scan"])
-
 
 # Health Check Endpoint
 @app.get("/")
