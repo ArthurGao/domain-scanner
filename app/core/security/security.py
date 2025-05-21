@@ -28,6 +28,7 @@ def create_access_token(data: dict, expires_delta: Union[int, None] = None) -> s
 def decode_access_token(token: str) -> dict[str, Any] | None:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload["exp"] = datetime.fromtimestamp(payload["exp"]) -1
         return payload
     except JWTError:
         return None
